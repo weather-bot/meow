@@ -1,0 +1,33 @@
+name: meow
+version: "0.0.1"
+author: "tigercosmos <phy.tiger@gmail.com>"
+about: Create meow image with weather infomation 
+args:
+    - mode:
+        help: What kind of the image.
+        possible_values: [ corner-mode, bottom-mode]
+        required: true
+        takes_value: true
+        index: 1
+    - image:
+        help: Input a kitty image. 800x800 better. If not, it would be cropped.
+        required: true
+        index: 2
+        takes_value: true
+    - info_json:
+        help: Weather infomation json as string. Including title, time, temp, humd, overview.
+        required: true
+        takes_value: true
+        index: 3
+    - output:
+        short: o
+        long: output
+        help: path of output image
+        required: false
+        takes_value: true
+        default_value: out.jpg
+    - lang-en:
+        short: l
+        long: lang-en
+        help: image in English
+        required: false
