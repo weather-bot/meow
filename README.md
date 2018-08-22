@@ -17,16 +17,24 @@ git clone https://github.com/weather-bot/meow.git
 cd meow
 ```
 
-You can create an image immediately.
-
-Chinese Demo:
+You can create a demo image immediately.
 
 ```sh
-cargo run test.jpg '{"title":"今天他喵的會下雨！","time":"明天下午","temp":23,"humd":34,"overview":"雨天"}'
+make test
 ```
 
-English Demo:
+To see the full usage:
 
 ```sh
-cargo run test.jpg '{"title":"Fucking meow hot!","time":"This PM","temp":23,"humd":34,"overview":"Rainy"}'
+make help
 ```
+
+## Demo
+
+The original image:
+
+![input](test.jpg)
+
+The output kitty image with information:
+
+![output](sample/corner_out.jpg)
