@@ -1,9 +1,9 @@
-use weather_info::WeatherInfo;
-use std::path::Path;
-use imageproc::drawing::draw_text_mut;
 use image;
-use image::{Rgba, ImageBuffer, imageops};
-use rusttype::{FontCollection, Scale, point, PositionedGlyph};
+use image::{imageops, ImageBuffer, Rgba};
+use imageproc::drawing::draw_text_mut;
+use rusttype::{point, FontCollection, PositionedGlyph, Scale};
+use std::path::Path;
+use weather_info::WeatherInfo;
 
 fn get_text_width(text: &str, height: u32) -> u32 {
     let font =
@@ -17,8 +17,8 @@ fn get_text_width(text: &str, height: u32) -> u32 {
     let v_metrics = font.v_metrics(scale);
     let offset = point(0.0, v_metrics.ascent);
 
-    let glyphs: Vec<PositionedGlyph> = font.layout(text, scale, offset)
-        .collect();
+    let glyphs: Vec<PositionedGlyph> =
+        font.layout(text, scale, offset).collect();
 
     let mut width = 0;
     for g in glyphs {
@@ -29,7 +29,7 @@ fn get_text_width(text: &str, height: u32) -> u32 {
     width as u32
 }
 
-//    The Image Outline
+//    The Image Outline for Corner Mode
 //
 //    800 x 800 input kitty image
 //    +---------------------------+
@@ -69,16 +69,16 @@ pub fn draw_corner(
 
     // Big title background
     let bg_img_title =
-        ImageBuffer::from_fn(IMG_HEIGHT, TITLE_HEIGHT, |_, _| background_color);
+        ImageBuffer::from_fn(IMG_HEIGHT, TITLE_HEIGHT, |_, _| {
+            background_color
+        });
     imageops::overlay(&mut origin_img, &bg_img_title, 0, 0);
 
-
     // Weather infomation background
-    let bg_img_info = ImageBuffer::from_fn(
-        CORNER_INFO_WIDTH,
-        CORNER_INFO_HEIGHT,
-        |_, _| background_color,
-    );
+    let bg_img_info =
+        ImageBuffer::from_fn(CORNER_INFO_WIDTH, CORNER_INFO_HEIGHT, |_, _| {
+            background_color
+        });
     imageops::overlay(&mut origin_img, &bg_img_info, pos_x, pos_y);
 
     // font type
@@ -154,6 +154,75 @@ pub fn draw_corner(
         Scale::uniform(text_height as f32),
         &font,
         &overview_str,
+    );
+
+    let _ = origin_img.save(Path::new(output_path)).unwrap();
+}
+
+// Image outline for Buttom-Mode
+//
+// 800 x 800 input kitty image
+// +-------------------------------------------+
+// |                                           |
+// |   Title                                   |
+// |                                           |
+// +-------------------------------------------+
+// |                                           |
+// |                                           |
+// |   Kitty Image                             |
+// |                                           |
+// |                                           |
+// |                                           |
+// +------------+------------+--------+--------+
+// |  Taipei    |  Rainny    |  LOGO  |        |
+// |            |            |        | 25°C   |
+// |  Tomorrow  |  Very Hot  |        |        |
+// |  15:00     |            |        |        |
+// +------------+------------+--------+--------+
+
+pub fn draw_bottom(
+    image_path: &str,
+    weather_info: &WeatherInfo,
+    output_path: &str,
+) {
+    let background_color_1 = Rgba([94u8, 94u8, 94u8, 100u8]); // More black
+    let background_color_2 = Rgba([146u8, 146u8, 146u8, 100u8]);
+    let background_color_3 = Rgba([213u8, 213u8, 213u8, 100u8]);
+    let background_color_4 = Rgba([255u8, 255u8, 255u8, 255u8]); // More white
+
+    let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
+
+    // font type
+    let font =
+        Vec::from(include_bytes!("../font/NotoSansCJKtc-Medium.ttf") as &[u8]);
+    let font = FontCollection::from_bytes(font)
+        .unwrap()
+        .into_font()
+        .unwrap();
+
+    // Open image and crop to the correct size
+    let mut origin_img = image::open(image_path).unwrap();
+    let mut origin_img =
+        imageops::crop(&mut origin_img, 0, 0, IMG_WIDTH, IMG_HEIGHT).to_image();
+
+    // Big title background
+    let bg_img_title =
+        ImageBuffer::from_fn(IMG_HEIGHT, TITLE_HEIGHT, |_, _| {
+            background_color_2
+        });
+    imageops::overlay(&mut origin_img, &bg_img_title, 0, 0);
+
+    // title
+    let text_height = TITLE_HEIGHT - 20;
+    let width = get_text_width(&weather_info.title, text_height);
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        ((IMG_WIDTH - width) as f32 / 4.0).round() as u32,
+        0,
+        Scale::uniform(text_height as f32),
+        &font,
+        &weather_info.title,
     );
 
     let _ = origin_img.save(Path::new(output_path)).unwrap();

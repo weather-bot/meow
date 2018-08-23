@@ -8,12 +8,12 @@ extern crate image;
 extern crate imageproc;
 extern crate rusttype;
 
-mod weather_info;
 mod draw;
+mod weather_info;
 
-use weather_info::WeatherInfo;
-use draw::draw_corner;
 use clap::App;
+use draw::{draw_bottom, draw_corner};
+use weather_info::WeatherInfo;
 
 fn main() {
     let yml = load_yaml!("../cli.yml");
@@ -40,8 +40,9 @@ fn main() {
         Some("corner-mode") => {
             draw_corner(&input_image_path, &info, &output_image_path);
         }
-        Some("buttom-mode") => {}
+        Some("bottom-mode") => {
+            draw_bottom(&input_image_path, &info, &output_image_path);
+        }
         _ => panic!("Not specified mode!"),
     }
-
 }
