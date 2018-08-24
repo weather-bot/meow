@@ -1,0 +1,10 @@
+language: rust
+
+script:
+  - make test
+  - make test-bottom
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never
