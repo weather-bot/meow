@@ -69,9 +69,7 @@ pub fn draw_corner(
 
     // Big title background
     let bg_img_title =
-        ImageBuffer::from_fn(IMG_HEIGHT, TITLE_HEIGHT, |_, _| {
-            background_color
-        });
+        ImageBuffer::from_fn(IMG_WIDTH, TITLE_HEIGHT, |_, _| background_color);
     imageops::overlay(&mut origin_img, &bg_img_title, 0, 0);
 
     // Weather infomation background
@@ -163,7 +161,7 @@ pub fn draw_corner(
 //
 // 800 x 800 input kitty image
 // +-------------------------------------------+
-// |                                           |
+// |   800 x 130                               |
 // |   Title                                   |
 // |                                           |
 // +-------------------------------------------+
@@ -172,23 +170,22 @@ pub fn draw_corner(
 // |   Kitty Image                             |
 // |                                           |
 // |                                           |
-// |                                           |
-// +------------+------------+--------+--------+
-// |  Taipei    |  Rainny    |  LOGO  |        |
-// |            |            |        | 25°C   |
-// |  Tomorrow  |  Very Hot  |        |        |
-// |  15:00     |            |        |        |
-// +------------+------------+--------+--------+
+// | 800 x 130 Info, 200 each block            |
+// +------------+-----------+------------------+
+// |  Taipei    | Rainny    |         |        |
+// |            |           |  87%    | 25°C   |
+// |  Tomorrow  | Very Hot  |         |        |
+// |  15:00     |           |         |        |
+// +------------+-----------+---------+--------+
+
+const BOTTOM_INFO_HEIGHT: u32 = 130;
 
 pub fn draw_bottom(
     image_path: &str,
     weather_info: &WeatherInfo,
     output_path: &str,
 ) {
-    let background_color_1 = Rgba([94u8, 94u8, 94u8, 100u8]); // More black
-    let background_color_2 = Rgba([146u8, 146u8, 146u8, 100u8]);
-    let background_color_3 = Rgba([213u8, 213u8, 213u8, 100u8]);
-    let background_color_4 = Rgba([255u8, 255u8, 255u8, 255u8]); // More white
+    let background_color = Rgba([94u8, 94u8, 94u8, 100u8]); // More black
 
     let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
 
@@ -207,10 +204,20 @@ pub fn draw_bottom(
 
     // Big title background
     let bg_img_title =
-        ImageBuffer::from_fn(IMG_HEIGHT, TITLE_HEIGHT, |_, _| {
-            background_color_2
-        });
+        ImageBuffer::from_fn(IMG_WIDTH, TITLE_HEIGHT, |_, _| background_color);
     imageops::overlay(&mut origin_img, &bg_img_title, 0, 0);
+
+    // Weather info background at bottom
+    let bk_img_info =
+        ImageBuffer::from_fn(IMG_WIDTH, BOTTOM_INFO_HEIGHT, |_, _| {
+            background_color
+        });
+    imageops::overlay(
+        &mut origin_img,
+        &bk_img_info,
+        0,
+        IMG_HEIGHT - BOTTOM_INFO_HEIGHT,
+    );
 
     // title
     let text_height = TITLE_HEIGHT - 20;
@@ -223,6 +230,109 @@ pub fn draw_bottom(
         Scale::uniform(text_height as f32),
         &font,
         &weather_info.title,
+    );
+
+    // Location
+    let bottom_pos_x = 10;
+    let bottom_pos_loc_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT;
+    let location_font_size = 80;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_loc_y,
+        Scale::uniform(location_font_size as f32),
+        &font,
+        &weather_info.location,
+    );
+
+    // Time
+    let bottom_pos_time_y = bottom_pos_loc_y + location_font_size;
+    let time_font_size = 50;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_time_y,
+        Scale::uniform(time_font_size as f32),
+        &font,
+        &weather_info.time,
+    );
+
+    // Overview 1
+    let bottom_pos_x = bottom_pos_x + 200;
+    let bottom_pos_ov1_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 10;
+    let ov1_font_size = 60;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_ov1_y,
+        Scale::uniform(ov1_font_size as f32),
+        &font,
+        &weather_info.overview,
+    );
+
+    // Overview 2
+    let bottom_pos_ov2_y = bottom_pos_ov1_y + ov1_font_size;
+    let ov2_font_size = 60;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_ov2_y,
+        Scale::uniform(ov2_font_size as f32),
+        &font,
+        &weather_info.overview2,
+    );
+
+    // Humidity
+    let bottom_pos_x = bottom_pos_x + 200;
+    let bottom_pos_humd_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
+    let water_drop_icon = image::open("img/water_drop.png").unwrap().to_rgba();
+    imageops::overlay(
+        &mut origin_img,
+        &water_drop_icon,
+        bottom_pos_x,
+        bottom_pos_humd_y,
+    );
+
+    let bottom_pos_humd_x = bottom_pos_x + 48 + 10; // 48 is icon width
+    let humd_font_size = 80.0;
+    let humd_str = format!("{}%", &weather_info.humd);
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_humd_x,
+        bottom_pos_humd_y,
+        Scale::uniform(humd_font_size),
+        &font,
+        &humd_str,
+    );
+
+    // Temperature
+    let bottom_pos_x = bottom_pos_x + 200;
+    let bottom_pos_temp_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
+    let thermometer_icon =
+        image::open("img/thermometer.png").unwrap().to_rgba();
+    imageops::overlay(
+        &mut origin_img,
+        &thermometer_icon,
+        bottom_pos_x,
+        bottom_pos_temp_y,
+    );
+
+    let bottom_pos_x = bottom_pos_x + 40 + 10; // 40 is icon width
+    let temp_font_size = 80.0;
+    let temp_str = format!("{}℃", &weather_info.temp);
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_temp_y,
+        Scale::uniform(temp_font_size),
+        &font,
+        &temp_str,
     );
 
     let _ = origin_img.save(Path::new(output_path)).unwrap();
