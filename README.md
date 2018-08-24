@@ -20,7 +20,8 @@ cd meow
 You can create a demo image immediately.
 
 ```sh
-make test
+make test        # Create in corner-mode
+make test-bottom # Create in bottom-mode
 ```
 
 To see the full usage:
@@ -33,8 +34,14 @@ make help
 
 The original image:
 
-![input](test.jpg)
+<img height="400" border="0" alt="input" src="https://raw.githubusercontent.com/weather-bot/meow/master/test.jpg">
 
-The output kitty image with information:
+The output kitty image with information
 
-![output](sample/corner_out.jpg)
+corner-mode:
+
+<img height="400" border="0" alt="corner_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/corner_out.jpg">
+
+bottom-mode:
+
+<img height="400" border="0" alt="bottom_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/bottom_out.jpg">
