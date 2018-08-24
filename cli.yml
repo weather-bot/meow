@@ -15,7 +15,7 @@ args:
         index: 2
         takes_value: true
     - info_json:
-        help: Weather infomation json as string. Including title, time, temp, humd, overview.
+        help: Weather infomation json as string. Including title, time, location, temp, humd, overview, overview2.
         required: true
         takes_value: true
         index: 3
