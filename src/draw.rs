@@ -20,13 +20,15 @@ fn get_text_width(text: &str, height: u32) -> u32 {
     let glyphs: Vec<PositionedGlyph> =
         font.layout(text, scale, offset).collect();
 
-    let mut width = 0;
+    let mut min = 10000;
+    let mut max = 0;
     for g in glyphs {
         if let Some(bb) = g.pixel_bounding_box() {
-            width += bb.width();
+            if bb.min.x < min { min = bb.min.x;}
+            if bb.max.x > max { max = bb.max.x;}
         }
     }
-    width as u32
+    (max - min) as u32
 }
 
 //    The Image Outline for Corner Mode
