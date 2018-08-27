@@ -1,6 +1,10 @@
 language: rust
 
+before_script:
+  - rustup component add rustfmt-preview 
+
 script:
+  - make check
   - make test
   - make test-bottom
 
