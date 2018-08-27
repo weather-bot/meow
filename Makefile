@@ -14,3 +14,6 @@ help:
 
 lint:
 	find ./src -name "*.rs" -exec rustfmt {} \;
+
+check:
+	find ./src -name "*.rs" -exec rustfmt --check {} \;
