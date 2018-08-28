@@ -24,8 +24,12 @@ fn get_text_width(text: &str, height: u32) -> u32 {
     let mut max = 0;
     for g in glyphs {
         if let Some(bb) = g.pixel_bounding_box() {
-            if bb.min.x < min { min = bb.min.x;}
-            if bb.max.x > max { max = bb.max.x;}
+            if bb.min.x < min {
+                min = bb.min.x;
+            }
+            if bb.max.x > max {
+                max = bb.max.x;
+            }
         }
     }
     (max - min) as u32
@@ -187,9 +191,9 @@ pub fn draw_bottom(
     weather_info: &WeatherInfo,
     output_path: &str,
 ) {
-    let background_color = Rgba([94u8, 94u8, 94u8, 100u8]); // More black
-
+    let background_color = Rgba([94u8, 94u8, 94u8, 100u8]);
     let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
+    let info_block_width: u32 = 200;
 
     // font type
     let font =
@@ -224,10 +228,11 @@ pub fn draw_bottom(
     // title
     let text_height = TITLE_HEIGHT - 20;
     let width = get_text_width(&weather_info.title, text_height);
+    check_width(width, IMG_WIDTH, "title");
     draw_text_mut(
         &mut origin_img,
         text_color,
-        ((IMG_WIDTH - width) as f32 / 4.0).round() as u32,
+        ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
         0,
         Scale::uniform(text_height as f32),
         &font,
@@ -238,6 +243,8 @@ pub fn draw_bottom(
     let bottom_pos_x = 10;
     let bottom_pos_loc_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT;
     let location_font_size = 80;
+    let width = get_text_width(&weather_info.location, location_font_size);
+    check_width(width, info_block_width, "location");
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -251,6 +258,8 @@ pub fn draw_bottom(
     // Time
     let bottom_pos_time_y = bottom_pos_loc_y + location_font_size;
     let time_font_size = 50;
+    let width = get_text_width(&weather_info.time, time_font_size);
+    check_width(width, info_block_width, "time");
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -262,9 +271,11 @@ pub fn draw_bottom(
     );
 
     // Overview 1
-    let bottom_pos_x = bottom_pos_x + 200;
+    let bottom_pos_x = bottom_pos_x + info_block_width;
     let bottom_pos_ov1_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 10;
     let ov1_font_size = 60;
+    let width = get_text_width(&weather_info.overview, ov1_font_size);
+    check_width(width, info_block_width, "overview");
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -278,6 +289,8 @@ pub fn draw_bottom(
     // Overview 2
     let bottom_pos_ov2_y = bottom_pos_ov1_y + ov1_font_size;
     let ov2_font_size = 60;
+    let width = get_text_width(&weather_info.overview2, ov2_font_size);
+    check_width(width, info_block_width, "overview2");
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -289,7 +302,7 @@ pub fn draw_bottom(
     );
 
     // Humidity
-    let bottom_pos_x = bottom_pos_x + 200;
+    let bottom_pos_x = bottom_pos_x + info_block_width;
     let bottom_pos_humd_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
     let water_drop_icon = image::open("img/water_drop.png").unwrap().to_rgba();
     imageops::overlay(
@@ -302,6 +315,7 @@ pub fn draw_bottom(
     let bottom_pos_humd_x = bottom_pos_x + 48 + 10; // 48 is icon width
     let humd_font_size = 80.0;
     let humd_str = format!("{}%", &weather_info.humd);
+    check_value(weather_info.humd, "humidity");
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -313,7 +327,7 @@ pub fn draw_bottom(
     );
 
     // Temperature
-    let bottom_pos_x = bottom_pos_x + 200;
+    let bottom_pos_x = bottom_pos_x + info_block_width;
     let bottom_pos_temp_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
     let thermometer_icon =
         image::open("img/thermometer.png").unwrap().to_rgba();
@@ -327,6 +341,7 @@ pub fn draw_bottom(
     let bottom_pos_x = bottom_pos_x + 40 + 10; // 40 is icon width
     let temp_font_size = 80.0;
     let temp_str = format!("{}℃", &weather_info.temp);
+    check_value(weather_info.temp, "temperature");
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -338,4 +353,56 @@ pub fn draw_bottom(
     );
 
     let _ = origin_img.save(Path::new(output_path)).unwrap();
+}
+
+fn check_width(real: u32, limit: u32, case: &str) {
+    if real > limit {
+        println!(
+            "The width of the {} is {}. The max is only {}.",
+            case, real, limit
+        );
+        panic!(
+            "The {} is too long. Please consider a shorter {}.",
+            case, case
+        );
+    }
+}
+
+fn check_value(real: f64, case: &str) {
+    if real > 100.0 {
+        println!("The value of the {} is {}. Are you kidding?", case, real);
+        panic!("The {} is too big. Please give a valid {}.", case, case);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn test_check_value_failed() {
+        check_value(120.0, "temp");
+    }
+
+    #[test]
+    fn test_check_value_work() {
+        check_value(100.0, "temp");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_check_width_failed() {
+        let width_limit = 800;
+        let width =
+            get_text_width("This string is very very very very long!", 100);
+        check_width(width, width_limit, "title");
+    }
+
+    #[test]
+    fn test_check_width_work() {
+        let width_limit = 800;
+        let width = get_text_width("This string is short!", 100);
+        check_width(width, width_limit, "title");
+    }
 }
