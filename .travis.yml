@@ -1,10 +1,13 @@
 language: rust
+rust:
+  - nightly
 
 before_script:
-  - rustup component add rustfmt-preview 
+  - rustup component add rustfmt-preview --toolchain nightly
 
 script:
   - make check
+  - cargo test
   - make test
   - make test-bottom
 
