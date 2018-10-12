@@ -182,7 +182,7 @@ pub fn draw_corner(
     // Humidity
     let pos_x = IMG_WIDTH - INFO_BLOCK_WIDTH + 10;
     let pos_y = IMG_HEIGHT - RIGHT_CORNER_HEIGHT + 10;
-    let water_drop_icon = image::open("img/water_drop.png").unwrap().to_rgba();
+    let water_drop_icon = image::load_from_memory(include_bytes!("../img/water_drop.png")).unwrap().to_rgba();
     imageops::overlay(&mut origin_img, &water_drop_icon, pos_x, pos_y);
 
     let pos_humd_x = pos_x + 48 + 10; // 48 is icon width
@@ -202,7 +202,7 @@ pub fn draw_corner(
     // Temperature
     let pos_y = pos_y + INFO_BLOCK_HEIGHT;
     let thermometer_icon =
-        image::open("img/thermometer.png").unwrap().to_rgba();
+        image::load_from_memory(include_bytes!("../img/thermometer.png")).unwrap().to_rgba();
     imageops::overlay(&mut origin_img, &thermometer_icon, pos_x, pos_y);
 
     let pos_tmp_x = pos_x + 40 + 10; // 40 is icon width
@@ -419,7 +419,7 @@ pub fn draw_bottom(
     // Humidity
     let bottom_pos_x = bottom_pos_x + info_block_width;
     let bottom_pos_humd_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
-    let water_drop_icon = image::open("img/water_drop.png").unwrap().to_rgba();
+    let water_drop_icon = image::load_from_memory(include_bytes!("../img/water_drop.png")).unwrap().to_rgba();
     imageops::overlay(
         &mut origin_img,
         &water_drop_icon,
@@ -445,7 +445,7 @@ pub fn draw_bottom(
     let bottom_pos_x = bottom_pos_x + info_block_width;
     let bottom_pos_temp_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
     let thermometer_icon =
-        image::open("img/thermometer.png").unwrap().to_rgba();
+        image::load_from_memory(include_bytes!("../img/thermometer.png")).unwrap().to_rgba();
     imageops::overlay(
         &mut origin_img,
         &thermometer_icon,
