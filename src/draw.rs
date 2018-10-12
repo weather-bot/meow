@@ -111,16 +111,42 @@ pub fn draw_corner(
     // title
     let text_height = TITLE_HEIGHT - 20;
     let width = get_text_width(&weather_info.title, text_height);
-    check_width(width, IMG_WIDTH, "title");
-    draw_text_mut(
-        &mut origin_img,
-        text_color,
-        ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
-        0,
-        Scale::uniform(text_height as f32),
-        &font,
-        &weather_info.title,
-    );
+    // title is short enough in a line
+    if width < IMG_WIDTH {
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            0,
+            Scale::uniform(text_height as f32),
+            &font,
+            &weather_info.title,
+        );
+    } else {
+        // Double the big title background
+        imageops::overlay(&mut origin_img, &bg_img_title, 0, TITLE_HEIGHT);
+        // print title in two lines        
+        let (first, last) = &weather_info.title.split_at(3 * 10);
+        let width = get_text_width(first, text_height);
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            0,
+            Scale::uniform(text_height as f32),
+            &font,
+            first,
+        );
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            TITLE_HEIGHT,
+            Scale::uniform(text_height as f32),
+            &font,
+            last,
+        );
+    }
 
     // Location
     let pos_x = 10;
@@ -291,16 +317,42 @@ pub fn draw_bottom(
     // title
     let text_height = TITLE_HEIGHT - 20;
     let width = get_text_width(&weather_info.title, text_height);
-    check_width(width, IMG_WIDTH, "title");
-    draw_text_mut(
-        &mut origin_img,
-        text_color,
-        ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
-        0,
-        Scale::uniform(text_height as f32),
-        &font,
-        &weather_info.title,
-    );
+    // title is short enough in a line
+    if width < IMG_WIDTH {
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            0,
+            Scale::uniform(text_height as f32),
+            &font,
+            &weather_info.title,
+        );
+    } else {
+        // Double the big title background
+        imageops::overlay(&mut origin_img, &bg_img_title, 0, TITLE_HEIGHT);
+        // print title in two lines
+        let (first, last) = &weather_info.title.split_at(3 * 10);
+        let width = get_text_width(first, text_height);
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            0,
+            Scale::uniform(text_height as f32),
+            &font,
+            first,
+        );
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            TITLE_HEIGHT,
+            Scale::uniform(text_height as f32),
+            &font,
+            last,
+        );
+    }
 
     // Location
     let bottom_pos_x = 10;
