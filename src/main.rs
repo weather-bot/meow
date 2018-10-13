@@ -45,4 +45,5 @@ fn main() {
         }
         _ => panic!("Not specified mode!"),
     }
+    println!("Create Meow Done!");
 }
