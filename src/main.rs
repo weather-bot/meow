@@ -7,6 +7,7 @@ extern crate serde_derive;
 extern crate image;
 extern crate imageproc;
 extern crate rusttype;
+use std::process;
 
 mod draw;
 mod weather_info;
@@ -22,7 +23,8 @@ fn main() {
     let input_image_path = if let Some(image_) = m.value_of("image") {
         image_
     } else {
-        panic!("Not specified input image!");
+        eprintln!("Not specified input image!");
+        process::exit(1);
     };
     let output_image_path = if let Some(output_) = m.value_of("output") {
         output_
@@ -33,17 +35,30 @@ fn main() {
         // Parse json to WeatherInfo
         serde_json::from_str(&info_json).unwrap()
     } else {
-        panic!("Not specified weather info json!");
+        eprintln!("Not specified weather info json!");
+        process::exit(1);
     };
 
     match m.value_of("mode") {
         Some("corner-mode") => {
-            draw_corner(&input_image_path, &info, &output_image_path);
+            if draw_corner(&input_image_path, &info, &output_image_path)
+                .is_err()
+            {
+                process::exit(1);
+            }
         }
         Some("bottom-mode") => {
-            draw_bottom(&input_image_path, &info, &output_image_path);
+            if draw_bottom(&input_image_path, &info, &output_image_path)
+                .is_err()
+            {
+                process::exit(1);
+            }
         }
-        _ => panic!("Not specified mode!"),
+        _ => {
+            eprintln!("Not specified mode!");
+            process::exit(1);
+        }
     }
     println!("Create Meow Done!");
+    process::exit(0);
 }

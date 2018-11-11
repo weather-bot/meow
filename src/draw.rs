@@ -62,7 +62,7 @@ pub fn draw_corner(
     image_path: &str,
     weather_info: &WeatherInfo,
     output_path: &str,
-) {
+) -> Result<(), ()> {
     let background_color = Rgba([94u8, 94u8, 94u8, 100u8]);
     let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
 
@@ -153,7 +153,7 @@ pub fn draw_corner(
     let pos_loc_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT;
     let location_font_size = 80;
     let width = get_text_width(&weather_info.location, location_font_size);
-    check_width(width, INFO_BLOCK_WIDTH, "location");
+    check_width(width, INFO_BLOCK_WIDTH, "location")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -168,7 +168,7 @@ pub fn draw_corner(
     let pos_time_y = pos_loc_y + location_font_size;
     let time_font_size = 50;
     let width = get_text_width(&weather_info.time, time_font_size);
-    check_width(width, INFO_BLOCK_WIDTH, "time");
+    check_width(width, INFO_BLOCK_WIDTH, "time")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -191,7 +191,7 @@ pub fn draw_corner(
     let pos_humd_x = pos_x + 48 + 10; // 48 is icon width
     let humd_font_size = 80.0;
     let humd_str = format!("{}%", &weather_info.humd);
-    check_value(weather_info.humd, "humidity");
+    check_value(weather_info.humd, "humidity")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -213,7 +213,7 @@ pub fn draw_corner(
     let pos_tmp_x = pos_x + 40 + 10; // 40 is icon width
     let temp_font_size = 80.0;
     let temp_str = format!("{}℃", &weather_info.temp);
-    check_value(weather_info.temp, "temperature");
+    check_value(weather_info.temp, "temperature")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -228,7 +228,7 @@ pub fn draw_corner(
     let pos_y = pos_y + INFO_BLOCK_HEIGHT;
     let ov1_font_size = 60;
     let width = get_text_width(&weather_info.overview, ov1_font_size);
-    check_width(width, INFO_BLOCK_WIDTH, "overview");
+    check_width(width, INFO_BLOCK_WIDTH, "overview")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -243,7 +243,7 @@ pub fn draw_corner(
     let pos_y = pos_y + ov1_font_size;
     let ov2_font_size = 60;
     let width = get_text_width(&weather_info.overview2, ov2_font_size);
-    check_width(width, INFO_BLOCK_WIDTH, "overview2");
+    check_width(width, INFO_BLOCK_WIDTH, "overview2")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -255,6 +255,7 @@ pub fn draw_corner(
     );
 
     let _ = origin_img.save(Path::new(output_path)).unwrap();
+    Ok(())
 }
 
 // Image outline for Buttom-Mode
@@ -284,7 +285,7 @@ pub fn draw_bottom(
     image_path: &str,
     weather_info: &WeatherInfo,
     output_path: &str,
-) {
+) -> Result<(), ()> {
     let background_color = Rgba([94u8, 94u8, 94u8, 100u8]);
     let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
     let info_block_width: u32 = 200;
@@ -364,7 +365,7 @@ pub fn draw_bottom(
     let bottom_pos_loc_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT;
     let location_font_size = 80;
     let width = get_text_width(&weather_info.location, location_font_size);
-    check_width(width, info_block_width, "location");
+    check_width(width, info_block_width, "location")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -379,7 +380,7 @@ pub fn draw_bottom(
     let bottom_pos_time_y = bottom_pos_loc_y + location_font_size;
     let time_font_size = 50;
     let width = get_text_width(&weather_info.time, time_font_size);
-    check_width(width, info_block_width, "time");
+    check_width(width, info_block_width, "time")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -395,7 +396,7 @@ pub fn draw_bottom(
     let bottom_pos_ov1_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 10;
     let ov1_font_size = 60;
     let width = get_text_width(&weather_info.overview, ov1_font_size);
-    check_width(width, info_block_width, "overview");
+    check_width(width, info_block_width, "overview")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -410,7 +411,7 @@ pub fn draw_bottom(
     let bottom_pos_ov2_y = bottom_pos_ov1_y + ov1_font_size;
     let ov2_font_size = 60;
     let width = get_text_width(&weather_info.overview2, ov2_font_size);
-    check_width(width, info_block_width, "overview2");
+    check_width(width, info_block_width, "overview2")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -438,7 +439,7 @@ pub fn draw_bottom(
     let bottom_pos_humd_x = bottom_pos_x + 48 + 10; // 48 is icon width
     let humd_font_size = 80.0;
     let humd_str = format!("{}%", &weather_info.humd);
-    check_value(weather_info.humd, "humidity");
+    check_value(weather_info.humd, "humidity")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -466,7 +467,7 @@ pub fn draw_bottom(
     let bottom_pos_x = bottom_pos_x + 40 + 10; // 40 is icon width
     let temp_font_size = 80.0;
     let temp_str = format!("{}℃", &weather_info.temp);
-    check_value(weather_info.temp, "temperature");
+    check_value(weather_info.temp, "temperature")?;
     draw_text_mut(
         &mut origin_img,
         text_color,
@@ -478,26 +479,31 @@ pub fn draw_bottom(
     );
 
     let _ = origin_img.save(Path::new(output_path)).unwrap();
+    Ok(())
 }
 
-fn check_width(real: u32, limit: u32, case: &str) {
+fn check_width(real: u32, limit: u32, case: &str) -> Result<(), ()> {
     if real > limit {
-        println!(
+        eprintln!(
             "The width of the {} is {}. The max is only {}.",
             case, real, limit
         );
-        panic!(
+        eprintln!(
             "The {} is too long. Please consider a shorter {}.",
             case, case
         );
+        return Err(());
     }
+    Ok(())
 }
 
-fn check_value(real: f64, case: &str) {
+fn check_value(real: f64, case: &str) -> Result<(), ()> {
     if real > 100.0 {
-        println!("The value of the {} is {}. Are you kidding?", case, real);
-        panic!("The {} is too big. Please give a valid {}.", case, case);
+        eprintln!("The value of the {} is {}. Are you kidding?", case, real);
+        eprintln!("The {} is too big. Please give a valid {}.", case, case);
+        return Err(());
     }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -505,29 +511,27 @@ mod tests {
     use super::*;
 
     #[test]
-    #[should_panic]
     fn test_check_value_failed() {
-        check_value(120.0, "temp");
+        assert!(check_value(120.0, "temp").is_err());
     }
 
     #[test]
     fn test_check_value_work() {
-        check_value(100.0, "temp");
+        assert!(check_value(100.0, "temp").is_ok());
     }
 
     #[test]
-    #[should_panic]
     fn test_check_width_failed() {
         let width_limit = 800;
         let width =
             get_text_width("This string is very very very very long!", 100);
-        check_width(width, width_limit, "title");
+        assert!(check_width(width, width_limit, "title").is_err());
     }
 
     #[test]
     fn test_check_width_work() {
         let width_limit = 800;
         let width = get_text_width("This string is short!", 100);
-        check_width(width, width_limit, "title");
+        assert!(check_width(width, width_limit, "title").is_ok());
     }
 }
