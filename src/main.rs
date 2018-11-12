@@ -41,17 +41,21 @@ fn main() {
 
     match m.value_of("mode") {
         Some("corner-mode") => {
-            if draw_corner(&input_image_path, &info, &output_image_path)
-                .is_err()
-            {
-                process::exit(1);
+            match draw_corner(&input_image_path, &info, &output_image_path) {
+                Err(e) => {
+                    eprintln!("{}", e);
+                    process::exit(1);
+                }
+                _ => {}
             }
         }
         Some("bottom-mode") => {
-            if draw_bottom(&input_image_path, &info, &output_image_path)
-                .is_err()
-            {
-                process::exit(1);
+            match draw_bottom(&input_image_path, &info, &output_image_path) {
+                Err(e) => {
+                    eprintln!("{}", e);
+                    process::exit(1);
+                }
+                _ => {}
             }
         }
         _ => {

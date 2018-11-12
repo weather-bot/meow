@@ -2,8 +2,25 @@ use image;
 use image::{imageops, ImageBuffer, Rgba};
 use imageproc::drawing::draw_text_mut;
 use rusttype::{point, FontCollection, PositionedGlyph, Scale};
+use std::fmt;
 use std::path::Path;
 use weather_info::WeatherInfo;
+
+pub enum DrawError {
+    WidthTooLong(u32, u32, String),
+    ValueTooHigh(f64, f64, String),
+}
+
+impl fmt::Display for DrawError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            DrawError::WidthTooLong(ref real, ref limit, ref case) => write!(f,
+            "The width of the `{}` is {}. The max is only {}. Please consider a shorter `{}`.", case, real, limit, case),
+            DrawError::ValueTooHigh(ref real, ref limit, ref case) => write!(f,
+            "The value of `{}` is {}. The max is only {}. Please give a valid `{}`.", case, real, limit, case),
+        }
+    }
+}
 
 fn get_text_width(text: &str, height: u32) -> u32 {
     let font =
@@ -62,7 +79,7 @@ pub fn draw_corner(
     image_path: &str,
     weather_info: &WeatherInfo,
     output_path: &str,
-) -> Result<(), ()> {
+) -> Result<(), DrawError> {
     let background_color = Rgba([94u8, 94u8, 94u8, 100u8]);
     let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
 
@@ -285,7 +302,7 @@ pub fn draw_bottom(
     image_path: &str,
     weather_info: &WeatherInfo,
     output_path: &str,
-) -> Result<(), ()> {
+) -> Result<(), DrawError> {
     let background_color = Rgba([94u8, 94u8, 94u8, 100u8]);
     let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
     let info_block_width: u32 = 200;
@@ -482,26 +499,17 @@ pub fn draw_bottom(
     Ok(())
 }
 
-fn check_width(real: u32, limit: u32, case: &str) -> Result<(), ()> {
+fn check_width(real: u32, limit: u32, case: &str) -> Result<(), DrawError> {
     if real > limit {
-        eprintln!(
-            "The width of the {} is {}. The max is only {}.",
-            case, real, limit
-        );
-        eprintln!(
-            "The {} is too long. Please consider a shorter {}.",
-            case, case
-        );
-        return Err(());
+        return Err(DrawError::WidthTooLong(real, limit, case.to_string()));
     }
     Ok(())
 }
 
-fn check_value(real: f64, case: &str) -> Result<(), ()> {
-    if real > 100.0 {
-        eprintln!("The value of the {} is {}. Are you kidding?", case, real);
-        eprintln!("The {} is too big. Please give a valid {}.", case, case);
-        return Err(());
+fn check_value(real: f64, case: &str) -> Result<(), DrawError> {
+    let limit = 100.0;
+    if real > limit {
+        return Err(DrawError::ValueTooHigh(real, limit, case.to_string()));
     }
     Ok(())
 }
