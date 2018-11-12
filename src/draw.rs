@@ -275,7 +275,7 @@ pub fn draw_corner(
     Ok(())
 }
 
-// Image outline for Buttom-Mode
+// Image outline for Bottom-Mode
 //
 // 800 x 800 input kitty image
 // +-------------------------------------------+
@@ -290,7 +290,7 @@ pub fn draw_corner(
 // |                                           |
 // | 800 x 130 Info, 200 each block            |
 // +------------+-----------+------------------+
-// |  Taipei    | Rainny    |         |        |
+// |  Taipei    | Rainy    |         |        |
 // |            |           |  87%    | 25°C   |
 // |  Tomorrow  | Very Hot  |         |        |
 // |  15:00     |           |         |        |
