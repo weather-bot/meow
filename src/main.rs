@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate clap;
+extern crate rand;
 extern crate serde;
 extern crate serde_json;
 #[macro_use]
@@ -13,7 +14,7 @@ mod draw;
 mod weather_info;
 
 use clap::App;
-use draw::{draw_bottom, draw_corner};
+use draw::{draw_bottom, draw_chinese, draw_corner};
 use weather_info::WeatherInfo;
 
 fn main() {
@@ -51,6 +52,15 @@ fn main() {
         }
         Some("bottom-mode") => {
             match draw_bottom(&input_image_path, &info, &output_image_path) {
+                Err(e) => {
+                    eprintln!("{}", e);
+                    process::exit(1);
+                }
+                _ => {}
+            }
+        }
+        Some("chinese-mode") => {
+            match draw_chinese(&input_image_path, &info, &output_image_path) {
                 Err(e) => {
                     eprintln!("{}", e);
                     process::exit(1);

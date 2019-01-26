@@ -45,3 +45,7 @@ corner-mode:
 bottom-mode:
 
 <img height="400" border="0" alt="bottom_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/bottom_out.jpg">
+
+chinese-mode:
+
+<img height="400" border="0" alt="bottom_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/chinese_out.jpg">

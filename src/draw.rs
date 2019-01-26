@@ -1,6 +1,7 @@
 use image;
 use image::{imageops, ImageBuffer, Rgba};
 use imageproc::drawing::draw_text_mut;
+use rand::Rng;
 use rusttype::{point, FontCollection, PositionedGlyph, Scale};
 use std::fmt;
 use std::path::Path;
@@ -371,6 +372,286 @@ pub fn draw_bottom(
             text_color,
             ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
             TITLE_HEIGHT,
+            Scale::uniform(text_height as f32),
+            &font,
+            last,
+        );
+    }
+
+    // Location
+    let bottom_pos_x = 10;
+    let bottom_pos_loc_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT;
+    let location_font_size = 80;
+    let width = get_text_width(&weather_info.location, location_font_size);
+    check_width(width, info_block_width, "location")?;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_loc_y,
+        Scale::uniform(location_font_size as f32),
+        &font,
+        &weather_info.location,
+    );
+
+    // Time
+    let bottom_pos_time_y = bottom_pos_loc_y + location_font_size;
+    let time_font_size = 50;
+    let width = get_text_width(&weather_info.time, time_font_size);
+    check_width(width, info_block_width, "time")?;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_time_y,
+        Scale::uniform(time_font_size as f32),
+        &font,
+        &weather_info.time,
+    );
+
+    // Overview 1
+    let bottom_pos_x = bottom_pos_x + info_block_width;
+    let bottom_pos_ov1_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 10;
+    let ov1_font_size = 60;
+    let width = get_text_width(&weather_info.overview, ov1_font_size);
+    check_width(width, info_block_width, "overview")?;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_ov1_y,
+        Scale::uniform(ov1_font_size as f32),
+        &font,
+        &weather_info.overview,
+    );
+
+    // Overview 2
+    let bottom_pos_ov2_y = bottom_pos_ov1_y + ov1_font_size;
+    let ov2_font_size = 60;
+    let width = get_text_width(&weather_info.overview2, ov2_font_size);
+    check_width(width, info_block_width, "overview2")?;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_ov2_y,
+        Scale::uniform(ov2_font_size as f32),
+        &font,
+        &weather_info.overview2,
+    );
+
+    // Humidity
+    let bottom_pos_x = bottom_pos_x + info_block_width;
+    let bottom_pos_humd_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
+    let water_drop_icon =
+        image::load_from_memory(include_bytes!("../img/water_drop.png"))
+            .unwrap()
+            .to_rgba();
+    imageops::overlay(
+        &mut origin_img,
+        &water_drop_icon,
+        bottom_pos_x,
+        bottom_pos_humd_y,
+    );
+
+    let bottom_pos_humd_x = bottom_pos_x + 48 + 10; // 48 is icon width
+    let humd_font_size = 80.0;
+    let humd_str = format!("{}%", &weather_info.humd);
+    check_value(weather_info.humd, "humidity")?;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_humd_x,
+        bottom_pos_humd_y,
+        Scale::uniform(humd_font_size),
+        &font,
+        &humd_str,
+    );
+
+    // Temperature
+    let bottom_pos_x = bottom_pos_x + info_block_width;
+    let bottom_pos_temp_y = IMG_HEIGHT - BOTTOM_INFO_HEIGHT + 30;
+    let thermometer_icon =
+        image::load_from_memory(include_bytes!("../img/thermometer.png"))
+            .unwrap()
+            .to_rgba();
+    imageops::overlay(
+        &mut origin_img,
+        &thermometer_icon,
+        bottom_pos_x,
+        bottom_pos_temp_y,
+    );
+
+    let bottom_pos_x = bottom_pos_x + 40 + 10; // 40 is icon width
+    let temp_font_size = 80.0;
+    let temp_str = format!("{}℃", &weather_info.temp);
+    check_value(weather_info.temp, "temperature")?;
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        bottom_pos_x,
+        bottom_pos_temp_y,
+        Scale::uniform(temp_font_size),
+        &font,
+        &temp_str,
+    );
+
+    let _ = origin_img.save(Path::new(output_path)).unwrap();
+    Ok(())
+}
+
+// Image outline for Chinese-Mode
+//
+// 800 x 800 input Chinese image
+// +-------------------------------------------+
+// |   800 x 130                               |
+// |   Greeting Title                          |
+// |                                           |
+// +-------------------------------------------+
+// |                                           |
+// |    Image                                  |
+// |                                           |
+// +-------------------------------------------+
+// |      800 x 130(260) Weather Title         |
+// |                                           |
+// +------------+-----------+------------------+
+// |  Taipei    | Rainy     |         |        |
+// |            |           |  87%    | 25°C   |
+// |  Tomorrow  | Very Hot  |         |        |
+// |  15:00     |           |         |        |
+// +------------+-----------+---------+--------+
+//  800 x 130 Info, 200 each block
+
+const WEATHER_TITLE_HEIGHT: u32 = 100;
+
+pub fn draw_chinese(
+    image_path: &str,
+    weather_info: &WeatherInfo,
+    output_path: &str,
+) -> Result<(), DrawError> {
+    let background_color = Rgba([94u8, 94u8, 94u8, 100u8]);
+    let text_color = Rgba([255u8, 255u8, 255u8, 255u8]);
+    let info_block_width: u32 = 200;
+
+    // font type
+    let font =
+        Vec::from(include_bytes!("../font/NotoSansCJKtc-Medium.ttf") as &[u8]);
+    let font = FontCollection::from_bytes(font)
+        .unwrap()
+        .into_font()
+        .unwrap();
+
+    // Open image and crop to the correct size
+    let mut origin_img = image::open(image_path).unwrap();
+    let mut origin_img =
+        imageops::crop(&mut origin_img, 0, 0, IMG_WIDTH, IMG_HEIGHT).to_image();
+
+    // greeting title background
+    let bg_img_title =
+        ImageBuffer::from_fn(IMG_WIDTH, TITLE_HEIGHT, |_, _| background_color);
+    imageops::overlay(&mut origin_img, &bg_img_title, 0, 0);
+
+    // Weather info background at bottom
+    let bk_img_info =
+        ImageBuffer::from_fn(IMG_WIDTH, BOTTOM_INFO_HEIGHT, |_, _| {
+            background_color
+        });
+    imageops::overlay(
+        &mut origin_img,
+        &bk_img_info,
+        0,
+        IMG_HEIGHT - BOTTOM_INFO_HEIGHT,
+    );
+
+    let text_height = TITLE_HEIGHT - 10;
+
+    // greeting title
+    let choices = vec![
+        "新年快樂，諸事吉祥",
+        "新年快樂，諸事如意",
+        "新年快樂，諸事圓融",
+        "新年快樂，諸事順利",
+        "新年快樂，珠圓玉潤",
+        "新年快樂，合璧連珠",
+        "新年快樂，朱玉滿堂",
+        "新年快樂，福相如豬",
+        "新年快樂，豬年吉祥",
+        "新年快樂，豬事大吉",
+        "豬入門，百福臻",
+        "新年快樂，金豬獻吉",
+        "新年快樂，金豬賀歲",
+        "新年快樂，金豬獻瑞",
+        "豬報平安，豬肥人富",
+        "春花百開，珠豬引福",
+        "新年快樂，吉祥如豬",
+        "新年快樂，喜從豬來",
+        "新年快樂，豬豬平安",
+        "新年快樂，朱帨迎祥",
+        "新年快樂，豬年好運",
+        "新年快樂，金豬頌春",
+        "豬行大運，豬旺旺來",
+        "豬年到好運到",
+    ];
+    let greeting_title =
+        choices[rand::thread_rng().gen_range(0, choices.len())];
+
+    let width = get_text_width(greeting_title, text_height);
+
+    draw_text_mut(
+        &mut origin_img,
+        text_color,
+        ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+        0,
+        Scale::uniform(text_height as f32),
+        &font,
+        greeting_title,
+    );
+
+    // weather title
+    let text_height = WEATHER_TITLE_HEIGHT - 20;
+    let width = get_text_width(&weather_info.title, text_height);
+    // title is short enough in a line
+    if width < IMG_WIDTH {
+        let title_pos = IMG_HEIGHT - BOTTOM_INFO_HEIGHT - WEATHER_TITLE_HEIGHT;
+        imageops::overlay(&mut origin_img, &bg_img_title, 0, title_pos);
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            title_pos,
+            Scale::uniform(text_height as f32),
+            &font,
+            &weather_info.title,
+        );
+    } else {
+        let title_pos =
+            IMG_HEIGHT - BOTTOM_INFO_HEIGHT - 2 * WEATHER_TITLE_HEIGHT;
+
+        // Double the weather title background
+        imageops::overlay(&mut origin_img, &bg_img_title, 0, title_pos);
+        imageops::overlay(
+            &mut origin_img,
+            &bg_img_title,
+            0,
+            title_pos + WEATHER_TITLE_HEIGHT,
+        );
+        // print title in two lines
+        let (first, last) = &weather_info.title.split_at(3 * 14);
+        let width = get_text_width(first, text_height);
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            title_pos,
+            Scale::uniform(text_height as f32),
+            &font,
+            first,
+        );
+        draw_text_mut(
+            &mut origin_img,
+            text_color,
+            ((IMG_WIDTH - width) as f32 / 2.0).round() as u32,
+            title_pos + WEATHER_TITLE_HEIGHT,
             Scale::uniform(text_height as f32),
             &font,
             last,
