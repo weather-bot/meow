@@ -20,8 +20,7 @@ cd meow
 You can create a demo image immediately.
 
 ```sh
-make test        # Create in corner-mode
-make test-bottom # Create in bottom-mode
+make test-light # Create in light-mode
 ```
 
 To see the full usage:
@@ -36,16 +35,6 @@ The original image:
 
 <img height="400" border="0" alt="input" src="https://raw.githubusercontent.com/weather-bot/meow/master/test.jpg">
 
-The output kitty image with information
+output with information in light-mode:
 
-corner-mode:
-
-<img height="400" border="0" alt="corner_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/corner_out.jpg">
-
-bottom-mode:
-
-<img height="400" border="0" alt="bottom_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/bottom_out.jpg">
-
-chinese-mode:
-
-<img height="400" border="0" alt="bottom_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/chinese_out.jpg">
+<img height="400" border="0" alt="light_output" src="https://raw.githubusercontent.com/weather-bot/meow/master/sample/light_out.jpg">

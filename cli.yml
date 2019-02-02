@@ -5,7 +5,7 @@ about: Create meow image with weather infomation
 args:
     - mode:
         help: What kind of the image.
-        possible_values: [ corner-mode, bottom-mode, chinese-mode]
+        possible_values: [light-mode]
         required: true
         takes_value: true
         index: 1

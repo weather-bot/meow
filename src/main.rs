@@ -14,7 +14,7 @@ mod draw;
 mod weather_info;
 
 use clap::App;
-use draw::{draw_bottom, draw_chinese, draw_corner};
+use draw::draw_light;
 use weather_info::WeatherInfo;
 
 fn main() {
@@ -41,26 +41,8 @@ fn main() {
     };
 
     match m.value_of("mode") {
-        Some("corner-mode") => {
-            match draw_corner(&input_image_path, &info, &output_image_path) {
-                Err(e) => {
-                    eprintln!("{}", e);
-                    process::exit(1);
-                }
-                _ => {}
-            }
-        }
-        Some("bottom-mode") => {
-            match draw_bottom(&input_image_path, &info, &output_image_path) {
-                Err(e) => {
-                    eprintln!("{}", e);
-                    process::exit(1);
-                }
-                _ => {}
-            }
-        }
-        Some("chinese-mode") => {
-            match draw_chinese(&input_image_path, &info, &output_image_path) {
+        Some("light-mode") => {
+            match draw_light(&input_image_path, &info, &output_image_path) {
                 Err(e) => {
                     eprintln!("{}", e);
                     process::exit(1);
