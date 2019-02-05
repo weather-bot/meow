@@ -135,6 +135,13 @@ pub fn draw_light(
     let second_pos_x = IMG_WIDTH - second_width;
     let second_pos_y = IMG_HEIGHT - second_block_height;
 
+    let watermark = "@氣象喵Wxkitty";
+    let watermark_font_size = 30;
+    let watermark_pos_x = IMG_WIDTH
+        - get_text_width(&watermark, watermark_font_size)
+        - second_padding_x;
+    let watermark_pos_y = second_pos_y - watermark_font_size - 5;
+
     // first block background
     let length = if first_line_end_pos_x > second_line_end_pos_x {
         first_line_end_pos_x
@@ -197,6 +204,17 @@ pub fn draw_light(
         Scale::uniform(second_block_font_size as f32),
         &font,
         &second_line,
+    );
+
+    // Watermark
+    draw_text_mut(
+        &mut origin_img,
+        first_text_color,
+        watermark_pos_x,
+        watermark_pos_y,
+        Scale::uniform(watermark_font_size as f32),
+        &font,
+        &watermark,
     );
 
     let _ = origin_img.save(Path::new(output_path)).unwrap();
