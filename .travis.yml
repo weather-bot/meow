@@ -8,8 +8,7 @@ before_script:
 script:
   - make check
   - cargo test
-  - make test
-  - make test-bottom
+  - make test-light
 
 notifications:
   email:
